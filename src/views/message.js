@@ -1,6 +1,14 @@
-exports.start = (msg) => {
-  const name = msg.from.first_name || 'there';
-  return `Hello, ${name}! Welcome to the bot. Use /help to see commands.`;
-};
+module.exports = {
+    start: (msg) => {
+        const name = msg.from.first_name || 'there';
+        return `Hello, ${name}! Welcome to Batbotbatbot. How can I assist you today?`;
+    },
 
-exports.help = `Batbotbatbot is a bot that helps you with various tasks`;
+    help: () => {
+        return `Here are the commands you can use:
+        /start - Start the bot
+        /help - Show this help message
+        /saldo - Check your current saldo
+        /addsaldo <amount> - Add saldo to your account`;
+    }
+}

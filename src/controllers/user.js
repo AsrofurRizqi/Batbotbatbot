@@ -8,8 +8,12 @@ module.exports = {
         const userId = msg.from.id;
         const userData = await user.findOne({ where: { id: userId } });
 
+        if (!userData) {
+            return bot.sendMessage(msg.chat.id, 'User not found.');
+        }
+
         const saldo = userData.saldo || 0;
-        bot.sendMessage(msg.chat.id, `Your current saldo is: ${saldo} coins`);
+        bot.sendMessage(msg.chat.id, `Your current saldo is: ${saldo}`);
     },
 
     userSince: async (msg, match, bot) => {

@@ -2,7 +2,7 @@ require('dotenv').config();
 module.exports = {
   "token": process.env.BOT_TOKEN,
   "development": {
-    "use_env_variable": "DATABASE_URL",
+    "use_env_variable": "DATABASE_URL_TEST",
     "dialect": process.env.DB_DIALECT
   },
   "production": {

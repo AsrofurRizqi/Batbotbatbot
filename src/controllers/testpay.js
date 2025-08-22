@@ -1,6 +1,9 @@
 const {
     user
 } = require('../models');
+const qrcode= require('qrcode');
+const qrisDinamis = require('qris-dinamis');
+const qris = '00020101021126680014ID.CO.MYACQ.WWW011812345678ID5909TOKO DEMO6007JAKARTA5802ID6304ABCD';
 const testPayMessage = require('../views/testPayMessage');
 
 module.exports = {
@@ -8,7 +11,7 @@ module.exports = {
         const userId = msg.from.id;
         const amount = parseFloat(match[1]);
 
-        if (isNaN(amount) || amount <= 0) {
+        if (isNaN(amount) || amount <= 5000) {
             return bot.sendMessage(msg.chat.id, 'Please provide a valid amount to add.');
         }
 
@@ -20,10 +23,17 @@ module.exports = {
                 return bot.sendMessage(msg.chat.id, 'User not found.');
             }
 
-            existingUser.saldo += amount;
-            await existingUser.save();
+            const string = qrisDinamis.makeString(qris, { nominal: `${amount}` });
 
-            bot.sendMessage(msg.chat.id, testPayMessage(existingUser.saldo));
+            qrcode.toFile(`./qr/qr-${msg.chat.id}.png`, string, { errorCorrectionLevel: 'H' }, (err) => {
+                if (err) {
+                    console.log(err);
+                    bot.sendMessage(msg.chat.id, 'Error generating QR code.');
+                return;
+                }
+            });
+
+            bot.sendPhoto(msg.chat.id, `./qr/qr-${msg.chat.id}.png`, { caption: 'Here is your QR code:' });
         } catch (error) {
             console.error('Error adding saldo:', error);
             bot.sendMessage(msg.chat.id, 'An error occurred while adding saldo. Please try again later.');
@@ -31,22 +41,12 @@ module.exports = {
     },
 
     addSaldoMessage: (msg, bot) => {
-        const helpMessage = `To add saldo, use the command:
-        /addsaldo <amount>
-        Example: /addsaldo 100
+        const helpMessage = `To add saldo, use the command :
+        /topup <amount>
+        Example: /topup 5000
+        Note: The minimum amount to add is 5000 units.
         This will add the specified amount to your saldo.`; 
         bot.sendMessage(msg.chat.id, helpMessage);
     },
 
-    addSaldoKeyboard: (msg, bot) => {
-        const keyboard = {
-            reply_markup: {
-                inline_keyboard: [
-                    [{ text: 'Add Saldo', callback_data: 'add_saldo' }],
-                    [{ text: 'Help', callback_data: 'add_saldo_help' }]
-                ]
-            }
-        };
-        bot.sendMessage(msg.chat.id, 'Choose an option:', keyboard);
-    }
 }

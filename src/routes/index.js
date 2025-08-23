@@ -25,6 +25,9 @@ module.exports = (bot) => {
   bot.onText(/saldo/, (msg) => {
     user.saldo(msg, null, bot);
   });
+  bot.onText(/buy (.+)/, (msg, match) => {
+    testPayCommand.buyServer(msg, match, bot);
+  });
 
   // Handle callback queries
   bot.on('callback_query', (callbackQuery) => {
